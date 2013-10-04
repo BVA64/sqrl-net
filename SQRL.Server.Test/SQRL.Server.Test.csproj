@@ -53,11 +53,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessageValidatorFacts.cs" />
     <Compile Include="MvcMockHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleData.cs" />
     <Compile Include="SqrlHttpHandlerFactoryFacts.cs" />
     <Compile Include="SqrlHttpHandlerFacts.cs" />
     <Compile Include="SqrlAuthenticatorTests.cs" />
+    <Compile Include="SqrlMessageFacts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

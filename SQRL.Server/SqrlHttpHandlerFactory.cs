@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace SQRL.Server
 {
-    public class SqrlHttpHandlerFactor : IHttpHandlerFactory
+    public class SqrlHttpHandlerFactory : IHttpHandlerFactory
     {
         public IHttpHandler GetHandler(HttpContext context, string requestType, string url, string pathTranslated)
         {

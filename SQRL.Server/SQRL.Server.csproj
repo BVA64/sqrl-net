@@ -45,10 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessageValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqrlHttpHandler.cs" />
-    <Compile Include="SqrlHttpHandlerFactor.cs" />
+    <Compile Include="SqrlHttpHandlerFactory.cs" />
     <Compile Include="SqrlAuthenticator.cs" />
+    <Compile Include="SqrlMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\lib\libsodium-4.dll">

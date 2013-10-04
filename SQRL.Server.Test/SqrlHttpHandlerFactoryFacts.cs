@@ -8,11 +8,11 @@ namespace SQRL.Server.Test
     {
         public class GetHandler
         {
-            private readonly SqrlHttpHandlerFactor _factory;
+            private readonly SqrlHttpHandlerFactory _factory;
 
             public GetHandler()
             {
-                _factory = new SqrlHttpHandlerFactor();
+                _factory = new SqrlHttpHandlerFactory();
             }
 
             [Fact]
