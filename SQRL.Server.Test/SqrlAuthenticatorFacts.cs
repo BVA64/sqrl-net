@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SQRL.Server.Test
 {
-    public class SqrlAuthenticatorTests
+    public class SqrlAuthenticatorFacts
     {
         public class Verify
         {

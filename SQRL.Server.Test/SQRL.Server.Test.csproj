@@ -59,7 +59,7 @@
     <Compile Include="SampleData.cs" />
     <Compile Include="SqrlHttpHandlerFactoryFacts.cs" />
     <Compile Include="SqrlHttpHandlerFacts.cs" />
-    <Compile Include="SqrlAuthenticatorTests.cs" />
+    <Compile Include="SqrlAuthenticatorFacts.cs" />
     <Compile Include="SqrlMessageFacts.cs" />
   </ItemGroup>
   <ItemGroup>
