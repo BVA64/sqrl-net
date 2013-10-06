@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Net;
 using System.Web;
 using FluentAssertions;
@@ -23,12 +24,21 @@ namespace SQRL.Server.Test
             [Fact]
             public void SetsResponseStatusCode200()
             {
+                InitializeForm();
+                
                 var response = Mock.Get(_context.Response);
                 response.SetupProperty(ctx => ctx.StatusCode);
 
                 _handler.ProcessRequest(_context);
                 
                 _context.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            }
+
+            private void InitializeForm()
+            {
+                var request = Mock.Get(_context.Request);
+                request.Setup(r => r.Form).Returns(new NameValueCollection());
+                request.Setup(r => r.Url).Returns(new Uri(SampleData.Url));
             }
         }
 
