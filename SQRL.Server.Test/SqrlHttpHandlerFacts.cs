@@ -17,6 +17,12 @@ namespace SQRL.Server.Test
 
             public ProcessRequest()
             {
+                var mockHandler = new Mock<ISqrlAuthenticationHandler>();
+                mockHandler.Setup(x => x.VerifySession(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+                var mockFactory = new Mock<ISqrlAuthenticationHandlerFactory>();
+                mockFactory.Setup(x => x.Create()).Returns(mockHandler.Object);
+                SqrlConfig.AuthenticationHandlerFactory = mockFactory.Object;
+
                 _handler = new SqrlHttpHandler();
                 _context = MvcMockHelpers.FakeHttpContext();
             }
@@ -25,7 +31,14 @@ namespace SQRL.Server.Test
             public void SetsResponseStatusCode200()
             {
                 InitializeForm();
-                
+
+                var queryString = new NameValueCollection();
+                queryString["sqrlsig"] = string.Empty;
+                queryString["sqrlkey"] = string.Empty;
+
+                var request = Mock.Get(_context.Request);
+                request.SetupGet(x => x.QueryString).Returns(queryString);
+
                 var response = Mock.Get(_context.Response);
                 response.SetupProperty(ctx => ctx.StatusCode);
 

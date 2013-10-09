@@ -13,10 +13,19 @@ namespace SQRL.Server
 
         public void ProcessRequest(HttpContextBase context)
         {
+            string d = context.Request.QueryString["d"];
+            int additionalChars;
+            int.TryParse(d, out additionalChars);
             var msg = new SqrlMessage
                 {
-                    SignatureBase64 = context.Request.Form["SIG"],
-                    PublicKeyBase64 = context.Request.Form["PK"],
+                    SignatureBase64 = context.Request.QueryString["sqrlsig"],
+                    PublicKeyBase64 = context.Request.QueryString["sqrlkey"],
+                    ClientNonce = context.Request.QueryString["sqrlnon"],
+                    ServerNonce = context.Request.QueryString["webnon"],
+                    IpAddress = context.Request.QueryString["ip"],
+                    Version = context.Request.QueryString["sqrlver"],
+                    Options = context.Request.QueryString["sqrlopt"],
+                    AdditionalDomainCharacters = additionalChars,
                     Uri = context.Request.Url
                 };
 

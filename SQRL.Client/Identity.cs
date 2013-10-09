@@ -3,13 +3,15 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
 using System.Security.Cryptography;
+using System.Text;
+using CryptSharp.Utility;
 
 namespace SQRL.Client
 {
     public sealed class Identity
     {
         private const int RandomEntropyBytes = 256;
-        private const int Pbkdf2Iterations = 1000;
+        private const int ScryptIterations = 1024;
         private const int KeyWidth = 256/8;
 
         private readonly string _name;
@@ -57,9 +59,7 @@ namespace SQRL.Client
             _masterKeySalt = Sodium.Random.GetBytes(RandomEntropyBytes);
 
             var passwordHashBytes = GetPasswordHash();
-
-            var hash = new Rfc2898DeriveBytes(generatedEntropy, entropy, Pbkdf2Iterations);
-            var master = hash.GetBytes(KeyWidth);
+            var master = SCrypt.ComputeDerivedKey(passwordHashBytes, entropy, ScryptIterations, 1024, 1, null, KeyWidth);
 
             for (int i = 0; i < master.Length; i++)
             {
@@ -113,8 +113,8 @@ namespace SQRL.Client
 
         private byte[] GetPasswordHash()
         {
-            var passwordHash = new Rfc2898DeriveBytes(_password.ToString(), _masterKeySalt, Pbkdf2Iterations);
-            return passwordHash.GetBytes(KeyWidth);
+            var passwordHashBytes = Encoding.ASCII.GetBytes(_password.ToString());
+            return SCrypt.ComputeDerivedKey(passwordHashBytes, _masterKeySalt, ScryptIterations, 1024, 1, null, KeyWidth);
         }
 
         public byte[] GetSitePrivateKey(string domain)
@@ -144,11 +144,5 @@ namespace SQRL.Client
             public byte[] MasterKey { get; set; }
             public byte[] Salt { get; set; }
         }
-    }
-
-    public interface IIdentityStorageProvider
-    {
-        void Save(string name, string value);
-        string Load(string name);
     }
 }

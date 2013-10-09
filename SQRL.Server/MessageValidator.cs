@@ -25,21 +25,32 @@ namespace SQRL.Server
 
         public void Validate(SqrlMessage msg)
         {
-            if(msg.Uri == null || msg.PublicKeyBase64 == null || msg.SignatureBase64 == null)
+            ISqrlAuthenticationHandler handler = GetHandler();
+            if (handler == null || msg.Uri == null || msg.PublicKeyBase64 == null || msg.SignatureBase64 == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (!handler.VerifySession(msg.IpAddress, msg.ServerNonce))
+            {
+                throw new Exception("Session not found.");
+            }
+
+            string url = msg.Uri.ToString().Remove(0, msg.Uri.Scheme.Length + 3);
+            int index = url.IndexOf("&sqrlsig=", StringComparison.Ordinal);
+            if (index <= 0)
             {
                 return;
             }
 
-            if (!SqrlAuthenticator.Verify(msg.Uri.ToString(), msg.SignatureBase64, msg.PublicKeyBase64))
+            url = url.Remove(index);
+
+            if (!SqrlAuthenticator.Verify(url, msg.SignatureBase64, msg.PublicKeyBase64))
             {
-                return;
+                throw new Exception("Authentication failed.");
             }
 
-            var handler = GetHandler();
-            if (handler != null)
-            {
-                handler.AuthenticateSession(msg.PublicKeyBase64, msg.Nonce);
-            }
+            handler.AuthenticateSession(msg.PublicKeyBase64, msg.IpAddress, msg.ServerNonce);
         }
 
         private ISqrlAuthenticationHandler GetHandler()

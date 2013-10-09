@@ -10,23 +10,26 @@ namespace SQRL.Server
 
         public string PublicKeyBase64 { get; set; }
 
-        public string Nonce
-        {
-            get
-            {
-                if(Uri == null) throw new InvalidOperationException("Unable to get nonce when Uri is null.");
-                return Uri.Query.Length > 0 ? Uri.Query.Remove(0, 1) : Uri.Query;
-            }
-        }
+        public string ClientNonce { get; set; }
+
+        public string ServerNonce { get; set; }
+
+        public string IpAddress { get; set; }
+
+        public string Version { get; set; }
+
+        public string Options { get; set; }
+
+        public int AdditionalDomainCharacters { get; set; }
 
         public byte[] SignatureBytes
         {
-            get { return Convert.FromBase64String(SignatureBase64); }
+            get { return Convert.FromBase64String(UrlSafeBase64Encoder.Decode(SignatureBase64)); }
         }
 
         public byte[] PublicKeyBytes
         {
-            get { return Convert.FromBase64String(PublicKeyBase64); }
+            get { return Convert.FromBase64String(UrlSafeBase64Encoder.Decode(PublicKeyBase64)); }
         }
     }
 }

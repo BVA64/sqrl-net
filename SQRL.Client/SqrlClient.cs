@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
+using SQRL.Server;
 using Sodium;
 
 namespace SQRL.Client
 {
     public class SqrlClient
     {
-        private const string SchemeSqrl = "sqrl";
-        private const string SchemeSqrls = "sqrls";
+        private const string SqrlVersion = "1.0";
+        private const string SchemeSqrl = "qrl";
+        private const string SchemeSqrls = "sqrl";
 
         private readonly Identity _identity;
 
@@ -39,38 +41,53 @@ namespace SQRL.Client
         {
             byte[] siteKey = _identity.GetSitePrivateKey(uri.Host);
 
-            string url = uri.ToString();
-            string schemalessUrl = url.Remove(0, uri.Scheme.Length + 3);
+            StringBuilder url = new StringBuilder(uri.ToString());
+            if (string.IsNullOrEmpty(uri.Query))
+                url.Append("?");
+            else if (!uri.Query.EndsWith("?"))
+                url.Append("&");
 
-            byte[] signed = CryptoSign.Sign(schemalessUrl, siteKey);
+            url.Append("sqrlnon=").Append(UrlSafeBase64Encoder.Encode(GetClientNonce()));
 
-            // TODO: Public Key???
-            byte[] publicKey = new byte[siteKey.Length];
+            string schemalessUrl = url.ToString().Remove(0, uri.Scheme.Length + 3);
 
+            var keypair = CryptoSign.GenerateKeyPair(siteKey);
+            byte[] signed = CryptoSign.Sign(schemalessUrl, keypair.SecretKey);
+            
             return new SqrlMessage
                 {
                     Uri = uri,
                     SignatureBase64 = Convert.ToBase64String(signed),
-                    PublicKeyBase64 = Convert.ToBase64String(publicKey)
+                    PublicKeyBase64 = Convert.ToBase64String(keypair.PublicKey)
                 };
+        }
+
+        private string GetClientNonce()
+        {
+            byte[] ticks = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
+            byte[] hash = CryptoHash.SHA256(ticks);
+            return Convert.ToBase64String(hash, 0, 9);
         }
 
         private void SendMessage(SqrlMessage message)
         {
-            string url = message.Uri.ToString();
-            string httpUrl = message.Uri.Scheme == SchemeSqrls
-                                 ? url.Replace("sqrls://", "https://")
-                                 : url.Replace("sqrl://", "http://");
+            StringBuilder url = new StringBuilder(message.Uri.ToString());
+            if (message.Uri.Scheme == SchemeSqrls)
+            {
+                url.Replace("sqrl://", "https://");
+            }
+            else
+            {
+                url.Replace("qrl://", "http://");
+            }
+
+            url.Append("&sqrlsig=").Append(UrlSafeBase64Encoder.Encode(message.SignatureBase64));
+            url.Append("&sqrlkey=").Append(UrlSafeBase64Encoder.Encode(message.PublicKeyBase64));
+            url.Append("&sqrlver=").Append(SqrlVersion);
 
             using (var client = new HttpClient())
             {
-                var content = new FormUrlEncodedContent(new[]
-                    {
-                        new KeyValuePair<string, string>("SIG", message.SignatureBase64),
-                        new KeyValuePair<string, string>("PUB", message.PublicKeyBase64)
-                    });
-
-                var result = client.PostAsync(httpUrl, content).Result;
+                var result = client.GetAsync(url.ToString()).Result;
                 result.EnsureSuccessStatusCode();
             }
         }

@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UrlSafeBase64Encoder.cs" />
     <Compile Include="ISqrlAuthenticationHandler.cs" />
     <Compile Include="ISqrlAuthenticationHandlerFactory.cs" />
     <Compile Include="MessageValidator.cs" />

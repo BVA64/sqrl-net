@@ -4,6 +4,8 @@
     {
         void StartSession(string sessionId);
 
-        void AuthenticateSession(string userId, string sessionId);
+        bool VerifySession(string ipAddress, string sessionId);
+
+        void AuthenticateSession(string userId, string ipAddress, string sessionId);
     }
 }

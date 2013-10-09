@@ -6,7 +6,7 @@ namespace SQRL.Server
     {
         static SqrlConfig()
         {
-            NonceLength = 64;
+            NonceLength = 24;
         }
 
         public static int NonceLength { get; set; }

@@ -6,39 +6,6 @@ namespace SQRL.Server.Test
 {
     public class SqrlMessageFacts
     {
-         public class NonceBytes
-         {
-             [Fact]
-             public void ThrowsWhenUriIsNull()
-             {
-                 string str;
-                 var msg = new SqrlMessage {Uri = null};
-                 Action act = () => str = msg.Nonce;
-
-                 act.ShouldThrow<InvalidOperationException>();
-             }
-
-             [Fact]
-             public void ReturnsTheNonceFromUri()
-             {
-                 var msg = new SqrlMessage {Uri = new Uri(SampleData.Url)};
-
-                 string actual = msg.Nonce;
-
-                 actual.Should().BeEquivalentTo(SampleData.Nonce);
-             }
-
-             [Fact]
-             public void ReturnsEmptyStringWhenNoNonceIsFound()
-             {
-                 var msg = new SqrlMessage {Uri = new Uri("http://example.com")};
-
-                 string nonce = msg.Nonce;
-                 
-                 nonce.Should().NotBeNull().And.BeEmpty();
-             }
-         }
-
         public class SignatureBytes
         {
             [Fact]
