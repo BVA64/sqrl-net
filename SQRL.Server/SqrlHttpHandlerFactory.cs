@@ -8,7 +8,7 @@ namespace SQRL.Server
         public IHttpHandler GetHandler(HttpContext context, string requestType, string url, string pathTranslated)
         {
             IHttpHandler handler = null;
-            if ("POST".Equals(requestType, StringComparison.OrdinalIgnoreCase))
+            if ("GET".Equals(requestType, StringComparison.OrdinalIgnoreCase))
             {
                 handler = new SqrlHttpHandler();
             }

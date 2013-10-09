@@ -16,22 +16,22 @@ namespace SQRL.Server.Test
             }
 
             [Fact]
-            public void ReturnsSqrlHandlerIfRequestTypeIsPost()
+            public void ReturnsSqrlHandlerIfRequestTypeIsGet()
             {
-                const string post = "POST";
+                const string get = "GET";
 
-                var handler = _factory.GetHandler(null, post, null, null);
+                var handler = _factory.GetHandler(null, get, null, null);
 
                 handler.Should().NotBeNull();
                 handler.Should().BeOfType<SqrlHttpHandler>();
             }
 
             [Fact]
-            public void ReturnsNullIfRequestTypeIsGet()
+            public void ReturnsNullIfRequestTypeIsPost()
             {
-                const string get = "GET";
+                const string post = "POST";
 
-                var handler = _factory.GetHandler(null, get, null, null);
+                var handler = _factory.GetHandler(null, post, null, null);
 
                 handler.Should().BeNull();
             }
