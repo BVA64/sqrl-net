@@ -24,12 +24,12 @@ namespace SQRL.Server
 
         public byte[] SignatureBytes
         {
-            get { return Convert.FromBase64String(UrlSafeBase64Encoder.Decode(SignatureBase64)); }
+            get { return Convert.FromBase64String(SignatureBase64); }
         }
 
         public byte[] PublicKeyBytes
         {
-            get { return Convert.FromBase64String(UrlSafeBase64Encoder.Decode(PublicKeyBase64)); }
+            get { return Convert.FromBase64String(PublicKeyBase64); }
         }
     }
 }

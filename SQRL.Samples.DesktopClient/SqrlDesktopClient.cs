@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Security;
 using System.Windows.Forms;
 using SQRL.Client;
 using SQRL.Samples.DesktopClient.StorageProvider;
@@ -18,12 +17,20 @@ namespace SQRL.Samples.DesktopClient
 
         private void openURLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadIdentity();
-
-            var uri = PromptForUrl();
-            if (uri != null)
+            try
             {
-                OpenUrl(uri);
+                LoadIdentity();
+
+                var uri = PromptForUrl();
+                if (uri != null)
+                {
+                    OpenUrl(uri);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was an error: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -54,7 +61,7 @@ namespace SQRL.Samples.DesktopClient
         {
             if (_identity != null) return;
 
-            SecureString password = GetIdentityPassword();
+            string password = GetIdentityPassword();
             if (password != null)
             {
                 try
@@ -68,7 +75,7 @@ namespace SQRL.Samples.DesktopClient
             }
         }
 
-        private void CreateIdentity(SecureString password = null)
+        private void CreateIdentity(string password = null)
         {
             if (password == null)
             {
@@ -84,7 +91,7 @@ namespace SQRL.Samples.DesktopClient
             _identity = Identity.CreateNew("Identity", password, entropy);
         }
 
-        private SecureString GetIdentityPassword()
+        private string GetIdentityPassword()
         {
             using (var dialog = new PasswordPrompt())
             {
@@ -114,6 +121,16 @@ namespace SQRL.Samples.DesktopClient
             {
                 MessageBox.Show("There was an error authenticating: " + e.Error.Message, "Error",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void newIdentityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (
+                MessageBox.Show("Are you sure you want to override your current identity with a new one?",
+                                "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                CreateIdentity();
             }
         }
     }

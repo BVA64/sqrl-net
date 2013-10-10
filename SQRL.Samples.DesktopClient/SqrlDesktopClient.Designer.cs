@@ -34,12 +34,13 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.importMasterKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportMasterKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.registerProtocolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.unregisterProtocolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.registerProtocolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.unregisterProtocolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.newIdentityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,6 +59,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openURLToolStripMenuItem,
             this.toolStripSeparator2,
+            this.newIdentityToolStripMenuItem,
             this.importMasterKeyToolStripMenuItem,
             this.exportMasterKeyToolStripMenuItem,
             this.toolStripSeparator3,
@@ -95,6 +97,23 @@
             this.exportMasterKeyToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.exportMasterKeyToolStripMenuItem.Text = "&Export Identity";
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(173, 6);
+            // 
+            // registerProtocolToolStripMenuItem
+            // 
+            this.registerProtocolToolStripMenuItem.Name = "registerProtocolToolStripMenuItem";
+            this.registerProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.registerProtocolToolStripMenuItem.Text = "&Register Protocol";
+            // 
+            // unregisterProtocolToolStripMenuItem
+            // 
+            this.unregisterProtocolToolStripMenuItem.Name = "unregisterProtocolToolStripMenuItem";
+            this.unregisterProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.unregisterProtocolToolStripMenuItem.Text = "&Unregister Protocol";
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -112,22 +131,12 @@
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
-            // registerProtocolToolStripMenuItem
+            // newIdentityToolStripMenuItem
             // 
-            this.registerProtocolToolStripMenuItem.Name = "registerProtocolToolStripMenuItem";
-            this.registerProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.registerProtocolToolStripMenuItem.Text = "&Register Protocol";
-            // 
-            // unregisterProtocolToolStripMenuItem
-            // 
-            this.unregisterProtocolToolStripMenuItem.Name = "unregisterProtocolToolStripMenuItem";
-            this.unregisterProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.unregisterProtocolToolStripMenuItem.Text = "&Unregister Protocol";
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(173, 6);
+            this.newIdentityToolStripMenuItem.Name = "newIdentityToolStripMenuItem";
+            this.newIdentityToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.newIdentityToolStripMenuItem.Text = "&New Identity";
+            this.newIdentityToolStripMenuItem.Click += new System.EventHandler(this.newIdentityToolStripMenuItem_Click);
             // 
             // SqrlDesktopClient
             // 
@@ -159,6 +168,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem registerProtocolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unregisterProtocolToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newIdentityToolStripMenuItem;
     }
 }
 

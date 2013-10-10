@@ -50,13 +50,14 @@ namespace SQRL.Client
             url.Append("sqrlnon=").Append(UrlSafeBase64Encoder.Encode(GetClientNonce()));
 
             string schemalessUrl = url.ToString().Remove(0, uri.Scheme.Length + 3);
+            byte[] urlBytes = Encoding.ASCII.GetBytes(schemalessUrl);
 
             var keypair = CryptoSign.GenerateKeyPair(siteKey);
-            byte[] signed = CryptoSign.Sign(schemalessUrl, keypair.SecretKey);
+            byte[] signed = CryptoSign.Sign(urlBytes, keypair.SecretKey);
             
             return new SqrlMessage
                 {
-                    Uri = uri,
+                    Uri = new Uri(url.ToString()),
                     SignatureBase64 = Convert.ToBase64String(signed),
                     PublicKeyBase64 = Convert.ToBase64String(keypair.PublicKey)
                 };

@@ -18,9 +18,9 @@ namespace SQRL.Server
             int.TryParse(d, out additionalChars);
             var msg = new SqrlMessage
                 {
-                    SignatureBase64 = context.Request.QueryString["sqrlsig"],
-                    PublicKeyBase64 = context.Request.QueryString["sqrlkey"],
-                    ClientNonce = context.Request.QueryString["sqrlnon"],
+                    SignatureBase64 = UrlSafeBase64Encoder.Decode(context.Request.QueryString["sqrlsig"]),
+                    PublicKeyBase64 = UrlSafeBase64Encoder.Decode(context.Request.QueryString["sqrlkey"]),
+                    ClientNonce = UrlSafeBase64Encoder.Decode(context.Request.QueryString["sqrlnon"]),
                     ServerNonce = context.Request.QueryString["webnon"],
                     IpAddress = context.Request.QueryString["ip"],
                     Version = context.Request.QueryString["sqrlver"],

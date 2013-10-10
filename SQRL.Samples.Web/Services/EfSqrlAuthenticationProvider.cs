@@ -38,8 +38,7 @@ namespace SQRL.Samples.Web.Services
             using (var ctx = new UsersContext())
             {
                 DateTime timeout = DateTime.UtcNow.AddSeconds(-TimeoutSeconds);
-                return ctx.UserSessions.Any(s => s.IpAddress == ipAddress &&
-                                                 s.SqrlId == sessionId &&
+                return ctx.UserSessions.Any(s => s.SqrlId == sessionId &&
                                                  s.AuthenticatedDatetime == null &&
                                                  s.CreatedDatetime >= timeout);
             }
@@ -50,8 +49,7 @@ namespace SQRL.Samples.Web.Services
             using (var ctx = new UsersContext())
             {
                 DateTime timeout = DateTime.UtcNow.AddSeconds(-TimeoutSeconds);
-                var usrSession = ctx.UserSessions.FirstOrDefault(s => s.IpAddress == ipAddress &&
-                                                                      s.SqrlId == sessionId &&
+                var usrSession = ctx.UserSessions.FirstOrDefault(s => s.SqrlId == sessionId &&
                                                                       s.AuthenticatedDatetime == null &&
                                                                       s.CreatedDatetime >= timeout);
                  if (usrSession == null)
@@ -67,7 +65,7 @@ namespace SQRL.Samples.Web.Services
         }
     }
 
-    public class EfSqrlAuthenticationProviderFactor : ISqrlAuthenticationHandlerFactory
+    public class EfSqrlAuthenticationProviderFactory : ISqrlAuthenticationHandlerFactory
     {
         public ISqrlAuthenticationHandler Create()
         {

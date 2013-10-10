@@ -21,7 +21,7 @@ namespace SQRL.Server
                 return false;
             }
 
-            string signedUrl = Encoding.UTF8.GetString(message);
+            string signedUrl = Encoding.ASCII.GetString(message);
             return signedUrl.Equals(url, StringComparison.Ordinal);
         }
     }

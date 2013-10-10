@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security;
 using System.Windows.Forms;
 
 namespace SQRL.Samples.DesktopClient
@@ -11,17 +10,9 @@ namespace SQRL.Samples.DesktopClient
             InitializeComponent();
         }
 
-        public SecureString Password
+        public string Password
         {
-            get
-            {
-                var password = new SecureString();
-                foreach (var c in passwordTextBox.Text)
-                {
-                    password.AppendChar(c);
-                }
-                return password;
-            }
+            get { return passwordTextBox.Text; }
         }
 
         private void CloseDialog(object sender, EventArgs e)

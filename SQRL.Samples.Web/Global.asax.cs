@@ -6,6 +6,8 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using SQRL.Samples.Web.Services;
+using SQRL.Server;
 
 namespace SQRL.Samples.Web
 {
@@ -23,6 +25,8 @@ namespace SQRL.Samples.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
+
+            SqrlConfig.AuthenticationHandlerFactory = new EfSqrlAuthenticationProviderFactory();
         }
     }
 }

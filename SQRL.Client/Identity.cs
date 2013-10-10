@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using CryptSharp.Utility;
+using Sodium;
 
 namespace SQRL.Client
 {
@@ -15,11 +16,11 @@ namespace SQRL.Client
         private const int KeyWidth = 256/8;
 
         private readonly string _name;
-        private readonly SecureString _password;
-        private byte[] _encryptedMasterKey;
+        private readonly string _password;
+        private byte[] _derivedMasterKey;
         private byte[] _masterKeySalt;
 
-        private Identity(string name, SecureString password)
+        private Identity(string name, string password)
         {
             _name = name;
             _password = password;
@@ -27,7 +28,7 @@ namespace SQRL.Client
 
         public static IIdentityStorageProvider StorageProvider { get; set; }
 
-        public static Identity CreateNew(string name, SecureString password, byte[] entropy)
+        public static Identity CreateNew(string name, string password, byte[] entropy)
         {
             if (name == null) throw new ArgumentNullException("name");
             if (password == null) throw new ArgumentNullException("password");
@@ -40,7 +41,7 @@ namespace SQRL.Client
             return id;
         }
 
-        public static Identity Open(string name, SecureString password)
+        public static Identity Open(string name, string password)
         {
             if (name == null) throw new ArgumentNullException("name");
             if (password == null) throw new ArgumentNullException("password");
@@ -54,35 +55,46 @@ namespace SQRL.Client
 
         private void GenerateMasterKey(byte[] entropy)
         {
-            // TODO: Currently using SHA1-PBKDF2, should upgrade to SHA256-PBKDF2
             byte[] generatedEntropy = Sodium.Random.GetBytes(RandomEntropyBytes);
             _masterKeySalt = Sodium.Random.GetBytes(RandomEntropyBytes);
 
+            var master = SCrypt.ComputeDerivedKey(generatedEntropy, entropy, ScryptIterations, 1024, 1, null, KeyWidth);
+
+            GenerateDerivedMasterKey(master);
+
+            SaveIdentity(master);
+
+            Array.Clear(master, 0, master.Length);
+        }
+
+        private void GenerateDerivedMasterKey(byte[] master)
+        {
             var passwordHashBytes = GetPasswordHash();
-            var master = SCrypt.ComputeDerivedKey(passwordHashBytes, entropy, ScryptIterations, 1024, 1, null, KeyWidth);
+            _derivedMasterKey = new byte[KeyWidth];
 
             for (int i = 0; i < master.Length; i++)
             {
-                master[i] = (byte)(master[i] ^ passwordHashBytes[i]);
+                _derivedMasterKey[i] = (byte) (master[i] ^ passwordHashBytes[i]);
             }
 
             Array.Clear(passwordHashBytes, 0, passwordHashBytes.Length);
-            _encryptedMasterKey = master;
-
-            SaveIdentity();
         }
 
-        private void SaveIdentity()
+        private void SaveIdentity(byte[] master)
         {
             if (StorageProvider == null)
             {
                 return;
             }
 
+            var verfier = CryptoHash.SHA256(_derivedMasterKey);
+            Array.Resize(ref verfier, 16);
             var store = new IdentityStore
                 {
-                    MasterKey = _encryptedMasterKey,
-                    Salt = _masterKeySalt
+                    MasterKey = master,
+                    Salt = _masterKeySalt,
+                    Verifier = verfier,
+                    Iterations = ScryptIterations
                 };
 
             var serializer = new BinaryFormatter();
@@ -107,35 +119,38 @@ namespace SQRL.Client
             
             var serializer = new BinaryFormatter();
             var store = (IdentityStore)serializer.Deserialize(new MemoryStream(data));
-            _encryptedMasterKey = store.MasterKey;
+
             _masterKeySalt = store.Salt;
+            GenerateDerivedMasterKey(store.MasterKey);
+
+            VerifyIdentity(store.Verifier);
+        }
+
+        private void VerifyIdentity(byte[] verifier)
+        {
+            byte[] computed = GetVerifierHash();
+            if (!computed.SequenceEqual(verifier))
+            {
+                throw new Exception("Invalid password.");
+            }
+        }
+
+        private byte[] GetVerifierHash()
+        {
+            var verfier = CryptoHash.SHA256(_derivedMasterKey);
+            Array.Resize(ref verfier, 16);
+            return verfier;
         }
 
         private byte[] GetPasswordHash()
         {
-            var passwordHashBytes = Encoding.ASCII.GetBytes(_password.ToString());
+            var passwordHashBytes = Encoding.ASCII.GetBytes(_password);
             return SCrypt.ComputeDerivedKey(passwordHashBytes, _masterKeySalt, ScryptIterations, 1024, 1, null, KeyWidth);
         }
 
         public byte[] GetSitePrivateKey(string domain)
         {
-            byte[] masterKey = DecryptMasterKey();
-            byte[] privateKey = Sodium.CryptoAuth.AuthHmacSha512_256(domain, masterKey);
-            Array.Clear(masterKey, 0, masterKey.Length);
-            return privateKey;
-        }
-
-        private byte[] DecryptMasterKey()
-        {
-            var passwordHash = GetPasswordHash();
-            var master = new byte[passwordHash.Length];
-
-            for (int i = 0; i < master.Length; i++)
-            {
-                master[i] = (byte) (_masterKeySalt[i] ^ passwordHash[i]);
-            }
-
-            return master;
+            return CryptoAuth.AuthHmacSha512_256(domain, _derivedMasterKey);
         }
 
         [Serializable]
@@ -143,6 +158,8 @@ namespace SQRL.Client
         {
             public byte[] MasterKey { get; set; }
             public byte[] Salt { get; set; }
+            public byte[] Verifier { get; set; }
+            public int Iterations { get; set; }
         }
     }
 }
