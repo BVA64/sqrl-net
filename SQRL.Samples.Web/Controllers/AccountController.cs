@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
 using Microsoft.Web.WebPages.OAuth;
+using SQRL.Server;
 using WebMatrix.WebData;
 using SQRL.Samples.Web.Filters;
 using SQRL.Samples.Web.Models;
@@ -23,8 +24,30 @@ namespace SQRL.Samples.Web.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            SetSqrlUrl();
+
             ViewBag.ReturnUrl = returnUrl;
             return View();
+        }
+
+        private void SetSqrlUrl()
+        {
+            var sqrl = new MessageValidator();
+            string sqrlSessionId = sqrl.CreateSession();
+            string ip = GetClientIp();
+            string path = string.Format(
+                "{0}://{1}/sqrl.axd?ip={2}&webnon={3}", "sqrl",
+                Request.Url.Authority, ip, sqrlSessionId);
+
+            ViewBag.SqrlUrl = path;
+        }
+
+        private string GetClientIp()
+        {
+            string ipAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            if (String.IsNullOrEmpty(ipAddress))
+                ipAddress = Request.ServerVariables["REMOTE_ADDR"];
+            return ipAddress;
         }
 
         //
@@ -35,14 +58,34 @@ namespace SQRL.Samples.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model, string returnUrl)
         {
-            if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
+            var session = GetAuthenticatedSession();
+            if (session != null)
             {
-                return RedirectToLocal(returnUrl);
+                if (WebSecurity.UserExists(session.UserId))
+                {
+                    WebSecurity.Login(session.UserId, session.UserId);
+                    return RedirectToLocal(returnUrl);
+                }
+
+                WebSecurity.CreateUserAndAccount(session.UserId, session.UserId);
+                WebSecurity.Login(session.UserId, session.UserId);
+                return RedirectToAction("Manage");
             }
 
             // If we got this far, something failed, redisplay form
-            ModelState.AddModelError("", "The user name or password provided is incorrect.");
+            ModelState.AddModelError("", "The SQRL login failed.  Please try again.");
+            SetSqrlUrl();
             return View(model);
+        }
+
+        private UserSession GetAuthenticatedSession()
+        {
+            string sessionId = Session.SessionID;
+            using (var ctx = new UsersContext())
+            {
+                return ctx.UserSessions.AsNoTracking()
+                          .FirstOrDefault(s => s.SessionId == sessionId && s.AuthenticatedDatetime != null);
+            }
         }
 
         //

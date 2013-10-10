@@ -20,7 +20,7 @@ namespace SQRL.Server
         private string GenerateSessionId()
         {
             var nonceBytes = Sodium.Random.GetBytes(SqrlConfig.NonceLength);
-            return Convert.ToBase64String(nonceBytes);
+            return UrlSafeBase64Encoder.Encode(Convert.ToBase64String(nonceBytes));
         }
 
         public void Validate(SqrlMessage msg)

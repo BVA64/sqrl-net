@@ -16,6 +16,7 @@ namespace SQRL.Samples.Web.Models
         }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<UserSession> UserSessions { get; set; }
     }
 
     [Table("UserProfile")]
@@ -25,6 +26,18 @@ namespace SQRL.Samples.Web.Models
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
         public string UserName { get; set; }
+    }
+
+    public class UserSession
+    {
+        [Key]
+        public string SessionId { get; set; }
+        public string IpAddress { get; set; }
+        public string SqrlId { get; set; }
+        public string UserId { get; set; }
+        public DateTime? CreatedDatetime { get; set; }
+        public DateTime? AuthenticatedDatetime { get; set; }
+        public DateTime? LoggedInDatetime { get; set; }
     }
 
     public class RegisterExternalLoginModel
@@ -57,17 +70,7 @@ namespace SQRL.Samples.Web.Models
 
     public class LoginModel
     {
-        [Required]
-        [Display(Name = "User name")]
-        public string UserName { get; set; }
-
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        public string SqrlUrl { get; private set; }
     }
 
     public class RegisterModel
