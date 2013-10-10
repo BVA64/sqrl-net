@@ -28,6 +28,7 @@ namespace SQRL.Samples.Web.Models
     public class UserSession
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string SessionId { get; set; }
         public string IpAddress { get; set; }
         public string SqrlId { get; set; }
