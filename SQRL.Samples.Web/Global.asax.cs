@@ -25,7 +25,6 @@ namespace SQRL.Samples.Web
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
 
-            Database.SetInitializer(new CreateDatabaseIfNotExists<UsersContext>());
             SqrlConfig.AuthenticationHandlerFactory = new EfSqrlAuthenticationProviderFactory();
         }
     }
