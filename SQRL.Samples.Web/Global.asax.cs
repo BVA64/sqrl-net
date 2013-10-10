@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data.Entity;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using SQRL.Samples.Web.Models;
 using SQRL.Samples.Web.Services;
 using SQRL.Server;
 
@@ -26,6 +25,7 @@ namespace SQRL.Samples.Web
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
 
+            Database.SetInitializer(new CreateDatabaseIfNotExists<UsersContext>());
             SqrlConfig.AuthenticationHandlerFactory = new EfSqrlAuthenticationProviderFactory();
         }
     }
