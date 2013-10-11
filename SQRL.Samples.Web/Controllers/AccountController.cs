@@ -10,12 +10,10 @@ using SQRL.Samples.Web.Models;
 namespace SQRL.Samples.Web.Controllers
 {
     [Authorize]
+    [RequireHttpsOnAppHarbor]
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        //
-        // GET: /Account/Login
-
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -32,10 +30,17 @@ namespace SQRL.Samples.Web.Controllers
             string sqrlSessionId = sqrl.CreateSession();
             string ip = GetClientIp();
             string path = string.Format(
-                "{0}://{1}/sqrl.axd?ip={2}&webnon={3}", Request.IsSecureConnection ? "sqrl" : "qrl",
+                "{0}://{1}/sqrl.axd?ip={2}&webnon={3}", IsSecureConnection() ? "sqrl" : "qrl",
                 Request.Url.Authority, ip, sqrlSessionId);
 
             ViewBag.SqrlUrl = path;
+        }
+
+        private bool IsSecureConnection()
+        {
+            string proto = Request.Headers["X-Forwarded-Proto"];
+            return Request.IsSecureConnection ||
+                   string.Equals(proto, "https", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private string GetClientIp()
@@ -45,9 +50,6 @@ namespace SQRL.Samples.Web.Controllers
                 ipAddress = Request.ServerVariables["REMOTE_ADDR"];
             return ipAddress;
         }
-
-        //
-        // POST: /Account/Login
 
         [HttpPost]
         [AllowAnonymous]
