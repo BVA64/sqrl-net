@@ -34,6 +34,7 @@ namespace SQRL.Samples.Web.Controllers
                 Request.Url.Authority, ip, sqrlSessionId);
 
             ViewBag.SqrlUrl = path;
+            ViewBag.SqrlId = sqrlSessionId;
         }
 
         private bool IsSecureConnection()
@@ -81,8 +82,16 @@ namespace SQRL.Samples.Web.Controllers
             string sessionId = Session.SessionID;
             using (var ctx = new UsersContext())
             {
-                return ctx.UserSessions.AsNoTracking()
-                          .FirstOrDefault(s => s.SessionId == sessionId && s.AuthenticatedDatetime != null);
+                UserSession session =
+                    ctx.UserSessions.FirstOrDefault(s => s.SessionId == sessionId && s.AuthenticatedDatetime != null);
+
+                if (session != null)
+                {
+                    ctx.UserSessions.Remove(session);
+                    ctx.SaveChanges();
+                }
+
+                return session;
             }
         }
 

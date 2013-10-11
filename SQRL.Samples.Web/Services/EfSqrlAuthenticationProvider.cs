@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Web;
+using Microsoft.AspNet.SignalR;
 using SQRL.Samples.Web.Models;
 using SQRL.Server;
 
@@ -21,6 +22,8 @@ namespace SQRL.Samples.Web.Services
                     session = new UserSession
                         {
                             SessionId = httpSessionId,
+                            AuthenticatedDatetime = null,
+                            LoggedInDatetime = null
                         };
 
                     ctx.UserSessions.Add(session);
@@ -62,6 +65,9 @@ namespace SQRL.Samples.Web.Services
 
                 ctx.SaveChanges();
             }
+
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<LoginHub>();
+            hubContext.Clients.Group(sessionId).login();
         }
     }
 

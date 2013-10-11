@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 
 namespace SQRL.Samples.Web.Models
 {
@@ -14,6 +15,21 @@ namespace SQRL.Samples.Web.Models
 
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<UsersContext, AutomaticMigrationConfiguration>());
+            base.OnModelCreating(modelBuilder);
+        }
+
+        public class AutomaticMigrationConfiguration : DbMigrationsConfiguration<UsersContext>
+        {
+            public AutomaticMigrationConfiguration()
+            {
+                AutomaticMigrationsEnabled = true;
+                AutomaticMigrationDataLossAllowed = true;
+            }
+        }
     }
 
     [Table("UserProfile")]
@@ -33,6 +49,7 @@ namespace SQRL.Samples.Web.Models
         public string IpAddress { get; set; }
         public string SqrlId { get; set; }
         public string UserId { get; set; }
+        public string SignalRId { get; set; }
         public DateTime? CreatedDatetime { get; set; }
         public DateTime? AuthenticatedDatetime { get; set; }
         public DateTime? LoggedInDatetime { get; set; }

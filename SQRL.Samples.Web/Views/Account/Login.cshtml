@@ -10,21 +10,24 @@
 
 <section id="loginForm">
 <h2>Log in using SQRL.</h2>
-@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
+@using (Html.BeginForm(null, null, new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "loginFormForm" })) {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
     <fieldset>
         <legend>Log in Form</legend>
-        <a href="@ViewBag.SqrlUrl">
+        <a id="sqrlLink" href="@ViewBag.SqrlUrl" data-sqrl-id="@ViewBag.SqrlId">
             <img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=@Url.Encode(ViewBag.SqrlUrl)" alt="SQRL Login" /><br/>
             @ViewBag.SqrlUrl
         </a><br/>
-        <input type="submit" value="Log in" />
+        <input type="submit" value="Log in" id="loginButton" />
     </fieldset>
 }
 </section>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/jquery.signalR-1.1.3.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Scripts/login.js"></script>
 }
