@@ -10,7 +10,7 @@ namespace SQRL.Client
 {
     public class SqrlClient
     {
-        private const string SqrlVersion = "1.0";
+        private const string SqrlVersion = "1";
         private const string SchemeSqrl = "qrl";
         private const string SchemeSqrls = "sqrl";
 
@@ -58,10 +58,10 @@ namespace SQRL.Client
             StringBuilder url = new StringBuilder(uri.ToString());
             if (string.IsNullOrEmpty(uri.Query))
                 url.Append("?");
-            else if (!uri.Query.EndsWith("?"))
+            else if (!uri.Query.EndsWith("?") && !uri.Query.EndsWith("&"))
                 url.Append("&");
 
-            url.Append("&sqrlver=").Append(SqrlVersion);
+            url.Append("sqrlver=").Append(SqrlVersion);
             url.Append("&sqrlkey=").Append(UrlSafeBase64Encoder.Encode(message.PublicKeyBase64));
 
             message.Uri = new Uri(url.ToString());
