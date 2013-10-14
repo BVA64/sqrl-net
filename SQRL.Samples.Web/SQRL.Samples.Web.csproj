@@ -210,10 +210,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="LoginHub.cs" />
-    <Compile Include="Migrations\201310111544386_InitialMigrations.cs" />
-    <Compile Include="Migrations\201310111544386_InitialMigrations.Designer.cs">
-      <DependentUpon>201310111544386_InitialMigrations.cs</DependentUpon>
-    </Compile>
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequireHttpsOnAppHarborAttribute.cs" />
@@ -338,11 +334,6 @@
       <Project>{60f7d7bd-24d6-4ce1-a340-5a5a1ac0e576}</Project>
       <Name>SQRL.Server</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201310111544386_InitialMigrations.resx">
-      <DependentUpon>201310111544386_InitialMigrations.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -30,8 +30,8 @@ namespace SQRL.Samples.Web.Controllers
             string sqrlSessionId = sqrl.CreateSession();
             string ip = GetClientIp();
             string path = string.Format(
-                "{0}://{1}/sqrl.axd?ip={2}&webnon={3}", IsSecureConnection() ? "sqrl" : "qrl",
-                Request.Url.Authority, ip, sqrlSessionId);
+                "{0}://{1}/sqrl.axd?nut={2}", IsSecureConnection() ? "sqrl" : "qrl",
+                Request.Url.Authority, sqrlSessionId);
 
             ViewBag.SqrlUrl = path;
             ViewBag.SqrlId = sqrlSessionId;
@@ -82,7 +82,7 @@ namespace SQRL.Samples.Web.Controllers
             string sessionId = Session.SessionID;
             using (var ctx = new UsersContext())
             {
-                UserSession session =
+                UserSession session = 
                     ctx.UserSessions.FirstOrDefault(s => s.SessionId == sessionId && s.AuthenticatedDatetime != null);
 
                 if (session != null)
@@ -95,9 +95,6 @@ namespace SQRL.Samples.Web.Controllers
             }
         }
 
-        //
-        // POST: /Account/LogOff
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
@@ -106,9 +103,6 @@ namespace SQRL.Samples.Web.Controllers
             Session.Abandon();
             return RedirectToAction("Index", "Home");
         }
-
-        //
-        // GET: /Account/Manage
 
         public ActionResult Manage(ManageMessageId? message)
         {
@@ -120,9 +114,6 @@ namespace SQRL.Samples.Web.Controllers
             ViewBag.ReturnUrl = Url.Action("Manage");
             return View();
         }
-
-        //
-        // POST: /Account/Manage
 
         [HttpPost]
         [ValidateAntiForgeryToken]

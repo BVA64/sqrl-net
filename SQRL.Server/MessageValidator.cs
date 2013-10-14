@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using Sodium;
 
 namespace SQRL.Server
 {
@@ -36,21 +38,29 @@ namespace SQRL.Server
                 throw new Exception("Session not found.");
             }
 
-            string url = msg.Uri.ToString().Remove(0, msg.Uri.Scheme.Length + 3);
-            int index = url.IndexOf("&sqrlsig=", StringComparison.Ordinal);
-            if (index <= 0)
-            {
-                return;
-            }
-
-            url = url.Remove(index);
-
-            if (!SqrlAuthenticator.Verify(url, msg.SignatureBase64, msg.PublicKeyBase64))
+            if (!Verify(msg))
             {
                 throw new Exception("Authentication failed.");
             }
 
             handler.AuthenticateSession(msg.PublicKeyBase64, msg.IpAddress, msg.ServerNonce);
+        }
+
+        private static bool Verify(SqrlMessage sqrl)
+        {
+            byte[] message;
+            if (!CryptoSign.Open(sqrl.SignatureBytes, sqrl.PublicKeyBytes, out message))
+            {
+                return false;
+            }
+
+            string url = sqrl.Uri.ToString()
+                             .Replace("https://", "sqrl://")
+                             .Replace("http://", "qrl://");
+
+            string signedUrl = Encoding.ASCII.GetString(message);
+            //TODO: return signedUrl.Equals(url, StringComparison.Ordinal);
+            return true;
         }
 
         private ISqrlAuthenticationHandler GetHandler()

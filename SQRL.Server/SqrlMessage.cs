@@ -10,8 +10,6 @@ namespace SQRL.Server
 
         public string PublicKeyBase64 { get; set; }
 
-        public string ClientNonce { get; set; }
-
         public string ServerNonce { get; set; }
 
         public string IpAddress { get; set; }

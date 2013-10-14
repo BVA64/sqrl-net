@@ -21,14 +21,13 @@ namespace SQRL.Samples.Web.Services
                 {
                     session = new UserSession
                         {
-                            SessionId = httpSessionId,
-                            AuthenticatedDatetime = null,
-                            LoggedInDatetime = null
+                            SessionId = httpSessionId
                         };
 
                     ctx.UserSessions.Add(session);
                 }
 
+                session.AuthenticatedDatetime = null;
                 session.SqrlId = sessionId;
                 session.CreatedDatetime = DateTime.UtcNow;
 

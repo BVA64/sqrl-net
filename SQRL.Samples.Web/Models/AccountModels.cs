@@ -18,7 +18,8 @@ namespace SQRL.Samples.Web.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<UsersContext, AutomaticMigrationConfiguration>());
+            Database.SetInitializer(new DropCreateDatabaseAlways<UsersContext>());
+//            Database.SetInitializer(new MigrateDatabaseToLatestVersion<UsersContext, AutomaticMigrationConfiguration>());
             base.OnModelCreating(modelBuilder);
         }
 
@@ -49,10 +50,8 @@ namespace SQRL.Samples.Web.Models
         public string IpAddress { get; set; }
         public string SqrlId { get; set; }
         public string UserId { get; set; }
-        public string SignalRId { get; set; }
         public DateTime? CreatedDatetime { get; set; }
         public DateTime? AuthenticatedDatetime { get; set; }
-        public DateTime? LoggedInDatetime { get; set; }
     }
 
     public class LocalPasswordModel

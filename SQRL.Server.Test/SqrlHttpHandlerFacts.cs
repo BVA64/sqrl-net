@@ -33,11 +33,14 @@ namespace SQRL.Server.Test
                 InitializeForm();
 
                 var queryString = new NameValueCollection();
-                queryString["sqrlsig"] = string.Empty;
-                queryString["sqrlkey"] = string.Empty;
+                queryString["sqrlkey"] = SampleData.PublicKey;
+
+                var forms = new NameValueCollection();
+                forms["sqrlsig"] = SampleData.Signature;
 
                 var request = Mock.Get(_context.Request);
                 request.SetupGet(x => x.QueryString).Returns(queryString);
+                request.SetupGet(x => x.Form).Returns(forms);
 
                 var response = Mock.Get(_context.Response);
                 response.SetupProperty(ctx => ctx.StatusCode);

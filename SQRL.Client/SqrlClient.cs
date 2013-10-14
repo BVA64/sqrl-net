@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using SQRL.Server;
@@ -39,7 +41,19 @@ namespace SQRL.Client
 
         private SqrlMessage PrepareMessage(Uri uri)
         {
-            byte[] siteKey = _identity.GetSitePrivateKey(uri.Host);
+            string site = uri.Host;
+            int additionalDomainsChars = GetAdditionalDomainChars(uri);
+            if (additionalDomainsChars > 1 && additionalDomainsChars <= uri.LocalPath.Length)
+            {
+                site += uri.LocalPath.Substring(0, additionalDomainsChars);
+            }
+
+            byte[] siteKey = _identity.GetSitePrivateKey(site);
+            var keys = CryptoSign.GenerateKeyPair(siteKey);
+            var message = new SqrlMessage
+            {
+                PublicKeyBase64 = Convert.ToBase64String(keys.PublicKey)
+            };
 
             StringBuilder url = new StringBuilder(uri.ToString());
             if (string.IsNullOrEmpty(uri.Query))
@@ -47,48 +61,50 @@ namespace SQRL.Client
             else if (!uri.Query.EndsWith("?"))
                 url.Append("&");
 
-            url.Append("sqrlnon=").Append(UrlSafeBase64Encoder.Encode(GetClientNonce()));
+            url.Append("&sqrlver=").Append(SqrlVersion);
+            url.Append("&sqrlkey=").Append(UrlSafeBase64Encoder.Encode(message.PublicKeyBase64));
 
-            string schemalessUrl = url.ToString().Remove(0, uri.Scheme.Length + 3);
-            byte[] urlBytes = Encoding.ASCII.GetBytes(schemalessUrl);
+            message.Uri = new Uri(url.ToString());
 
-            var keypair = CryptoSign.GenerateKeyPair(siteKey);
-            byte[] signed = CryptoSign.Sign(urlBytes, keypair.SecretKey);
-            
-            return new SqrlMessage
-                {
-                    Uri = new Uri(url.ToString()),
-                    SignatureBase64 = Convert.ToBase64String(signed),
-                    PublicKeyBase64 = Convert.ToBase64String(keypair.PublicKey)
-                };
+            byte[] urlBytes = Encoding.ASCII.GetBytes(message.Uri.ToString());
+            byte[] signed = CryptoSign.Sign(urlBytes, keys.SecretKey);
+
+            message.SignatureBase64 = Convert.ToBase64String(signed);
+
+            return message;
         }
 
-        private string GetClientNonce()
+        private int GetAdditionalDomainChars(Uri uri)
         {
-            byte[] ticks = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-            byte[] hash = CryptoHash.SHA256(ticks);
-            return Convert.ToBase64String(hash, 0, 9);
+            int d = 0;
+            var domain = uri.Query.TrimStart('?')
+                .Split(new[] {'&'}, StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault(s => s.StartsWith("d="));
+            if (domain != null)
+            {
+                string domainStr = domain.Substring(2);
+
+                int.TryParse(domainStr, out d);
+            }
+            return d;
         }
 
         private void SendMessage(SqrlMessage message)
         {
-            StringBuilder url = new StringBuilder(message.Uri.ToString());
-            if (message.Uri.Scheme == SchemeSqrls)
-            {
-                url.Replace("sqrl://", "https://");
-            }
-            else
-            {
-                url.Replace("qrl://", "http://");
-            }
+            string url = message.Uri.ToString();
 
-            url.Append("&sqrlsig=").Append(UrlSafeBase64Encoder.Encode(message.SignatureBase64));
-            url.Append("&sqrlkey=").Append(UrlSafeBase64Encoder.Encode(message.PublicKeyBase64));
-            url.Append("&sqrlver=").Append(SqrlVersion);
+            url = message.Uri.Scheme == SchemeSqrls
+                      ? url.Replace("sqrl://", "https://")
+                      : url.Replace("qrl://", "http://");
+
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("sqrlsig", UrlSafeBase64Encoder.Encode(message.SignatureBase64))
+                });
 
             using (var client = new HttpClient())
             {
-                var result = client.GetAsync(url.ToString()).Result;
+                var result = client.PostAsync(url, content).Result;
                 result.EnsureSuccessStatusCode();
             }
         }
