@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using SQRL.Client;
@@ -13,7 +14,10 @@ namespace SQRL.Samples.DesktopClient
         public SqrlDesktopClient()
         {
             InitializeComponent();
+            Urls = new List<string>();
         }
+
+        public List<string> Urls { get; private set; }
 
         private void openURLToolStripMenuItem_Click(object sender, EventArgs e)
         {
