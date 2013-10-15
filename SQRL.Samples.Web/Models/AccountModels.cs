@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using Devtalk.EF.CodeFirst;
 
 namespace SQRL.Samples.Web.Models
 {
@@ -18,8 +19,11 @@ namespace SQRL.Samples.Web.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+#if DEBUG
             Database.SetInitializer(new DropCreateDatabaseAlways<UsersContext>());
-//            Database.SetInitializer(new MigrateDatabaseToLatestVersion<UsersContext, AutomaticMigrationConfiguration>());
+#else
+            Database.SetInitializer(new DontDropDbJustCreateTablesIfModelChanged<UsersContext>());
+#endif
             base.OnModelCreating(modelBuilder);
         }
 

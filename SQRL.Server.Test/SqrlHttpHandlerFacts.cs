@@ -34,6 +34,7 @@ namespace SQRL.Server.Test
 
                 var queryString = new NameValueCollection();
                 queryString["sqrlkey"] = SampleData.PublicKey;
+                queryString["sqrlver"] = "1";
 
                 var forms = new NameValueCollection();
                 forms["sqrlsig"] = SampleData.Signature;
@@ -41,6 +42,7 @@ namespace SQRL.Server.Test
                 var request = Mock.Get(_context.Request);
                 request.SetupGet(x => x.QueryString).Returns(queryString);
                 request.SetupGet(x => x.Form).Returns(forms);
+                request.SetupGet(x => x.ServerVariables).Returns(new NameValueCollection());
 
                 var response = Mock.Get(_context.Response);
                 response.SetupProperty(ctx => ctx.StatusCode);
