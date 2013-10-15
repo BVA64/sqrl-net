@@ -32,6 +32,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openURLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.newIdentityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importMasterKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportMasterKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -40,7 +41,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.newIdentityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -76,12 +76,19 @@
             this.openURLToolStripMenuItem.Name = "openURLToolStripMenuItem";
             this.openURLToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.openURLToolStripMenuItem.Text = "&Open URL";
-            this.openURLToolStripMenuItem.Click += new System.EventHandler(this.openURLToolStripMenuItem_Click);
+            this.openURLToolStripMenuItem.Click += new System.EventHandler(this.OpenEnteredUrl);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(173, 6);
+            // 
+            // newIdentityToolStripMenuItem
+            // 
+            this.newIdentityToolStripMenuItem.Name = "newIdentityToolStripMenuItem";
+            this.newIdentityToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.newIdentityToolStripMenuItem.Text = "&New Identity";
+            this.newIdentityToolStripMenuItem.Click += new System.EventHandler(this.CreateNewIdentity);
             // 
             // importMasterKeyToolStripMenuItem
             // 
@@ -107,12 +114,14 @@
             this.registerProtocolToolStripMenuItem.Name = "registerProtocolToolStripMenuItem";
             this.registerProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.registerProtocolToolStripMenuItem.Text = "&Register Protocol";
+            this.registerProtocolToolStripMenuItem.Click += new System.EventHandler(this.Register);
             // 
             // unregisterProtocolToolStripMenuItem
             // 
             this.unregisterProtocolToolStripMenuItem.Name = "unregisterProtocolToolStripMenuItem";
             this.unregisterProtocolToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.unregisterProtocolToolStripMenuItem.Text = "&Unregister Protocol";
+            this.unregisterProtocolToolStripMenuItem.Click += new System.EventHandler(this.Unregister);
             // 
             // toolStripSeparator1
             // 
@@ -124,19 +133,12 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.Exit);
             // 
             // backgroundWorker
             // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
-            // 
-            // newIdentityToolStripMenuItem
-            // 
-            this.newIdentityToolStripMenuItem.Name = "newIdentityToolStripMenuItem";
-            this.newIdentityToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.newIdentityToolStripMenuItem.Text = "&New Identity";
-            this.newIdentityToolStripMenuItem.Click += new System.EventHandler(this.newIdentityToolStripMenuItem_Click);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.WorkerCompleted);
             // 
             // SqrlDesktopClient
             // 
@@ -147,6 +149,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "SqrlDesktopClient";
             this.Text = "SQRL Client";
+            this.Load += new System.EventHandler(this.FormLoad);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

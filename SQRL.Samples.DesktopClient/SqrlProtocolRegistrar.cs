@@ -42,7 +42,7 @@ namespace SQRL.Samples.DesktopClient
 
         private static void UnregisterProtocol(string protocol)
         {
-            
+            Registry.ClassesRoot.DeleteSubKeyTree(protocol);
         }
     }
 }

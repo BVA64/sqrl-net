@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using NDesk.Options;
 using SQRL.Client;
 using SQRL.Samples.DesktopClient.StorageProvider;
 
@@ -8,42 +7,60 @@ namespace SQRL.Samples.DesktopClient
 {
     static class Program
     {
+        public const int Success = 0;
+        public const int GeneralError = -1;
+        public const int Unauthorized = -2;
+        public const int NotRegistered = -3;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        private static int Main(string[] args)
         {
-            bool register = false;
-            bool unregister = false;
-
-            var optSet = new OptionSet
+            if (args.Length > 0)
+            {
+                string action = string.Empty;
+                try
                 {
-                    {"r|register", v => register = v != null},
-                    {"u|unregister", v => unregister = v != null}
-                };
+                    if (args[0] == "/register")
+                    {
+                        action = "register";
+                        SqrlProtocolRegistrar.Register();
+                        return Success;
+                    }
 
-            var extra = optSet.Parse(args);
-
-            if (register)
-            {
-                SqrlProtocolRegistrar.Register();
+                    if (args[0] == "/unregister")
+                    {
+                        action = "unregister";
+                        SqrlProtocolRegistrar.Unregister();
+                        return Success;
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return Unauthorized;
+                }
+                catch (ArgumentException)
+                {
+                    return NotRegistered;
+                }
+                catch
+                {
+                    return GeneralError;
+                }
             }
-            else if (unregister)
-            {
-                SqrlProtocolRegistrar.Unregister();
-            }
-            else
-            {
-                Identity.StorageProvider = new AppSettingsIdentityStorageProvider();
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
 
-                var sqrlDesktopClient = new SqrlDesktopClient();
-                sqrlDesktopClient.Urls.AddRange(extra);
+            Identity.StorageProvider = new AppSettingsIdentityStorageProvider();
 
-                Application.Run(sqrlDesktopClient);
-            }
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var sqrlDesktopClient = new SqrlDesktopClient();
+            sqrlDesktopClient.Urls.AddRange(args);
+
+            Application.Run(sqrlDesktopClient);
+            return 0;
         }
     }
 }

@@ -14,6 +14,6 @@ You can see a sample of the sample web server running at: https://sqrl.apphb.com
 
 ### Features for the Future
 
-* Built in Windows protocol handler.
 * More strict checks on the server side.
 * Identity management (multiple identities).
+* Generate QR codes locally.
