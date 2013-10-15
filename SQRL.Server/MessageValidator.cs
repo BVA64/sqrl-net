@@ -6,6 +6,8 @@ namespace SQRL.Server
 {
     public class MessageValidator
     {
+        private const string SqrlVersion = "1";
+
         public string CreateSession()
         {
             string sessionId = GenerateSessionId();
@@ -31,6 +33,11 @@ namespace SQRL.Server
             if (handler == null || msg.Uri == null || msg.PublicKeyBase64 == null || msg.SignatureBase64 == null)
             {
                 throw new InvalidOperationException();
+            }
+
+            if (msg.Version != SqrlVersion)
+            {
+                throw new Exception("Invalid version.  Expected version was: " + SqrlVersion);
             }
 
             if (!handler.VerifySession(msg.IpAddress, msg.ServerNonce))
@@ -59,8 +66,7 @@ namespace SQRL.Server
                              .Replace("http://", "qrl://");
 
             string signedUrl = Encoding.ASCII.GetString(message);
-            //TODO: return signedUrl.Equals(url, StringComparison.Ordinal);
-            return true;
+            return signedUrl.Equals(url, StringComparison.Ordinal);
         }
 
         private ISqrlAuthenticationHandler GetHandler()
