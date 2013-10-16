@@ -19,8 +19,13 @@
 <ol class="round">
     <li class="one">
         <h5>Download a SQRL client.</h5>
-        You can download a Windows based client using the link below.
-@*        <a href="@Url.Content("~/downloads/SqrlClient.exe")">Download Here…</a>*@
+        Some sample clients can be found <a href="https://www.grc.com/sqrl/implementations.htm">here</a>.
+        @if (!string.IsNullOrEmpty(ViewBag.DownloadLink))
+        {
+            <br />
+            @:You can download a Windows based client using the following link.
+            <a href="@ViewBag.DownloadLink">Download Here…</a>
+        }
     </li>
 
     <li class="two">
