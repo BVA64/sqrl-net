@@ -17,6 +17,8 @@ namespace SQRL.Samples.Web
     {
         protected void Application_Start()
         {
+            Database.SetInitializer(new CreateDatabaseIfNotExists<UsersContext>());
+            
             AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
