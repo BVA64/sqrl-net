@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -66,8 +67,13 @@ namespace SQRL.Client
 
             message.Uri = new Uri(url.ToString());
 
-            byte[] urlBytes = Encoding.ASCII.GetBytes(message.Uri.ToString());
+            var idn = new IdnMapping();
+            var puny = idn.GetAscii(message.Uri.ToString());
+            byte[] urlBytes = Encoding.ASCII.GetBytes(puny);
             byte[] signed = CryptoSign.Sign(urlBytes, keys.SecretKey);
+
+            // The signature is only the first 64 bytes, the rest is the message
+            Array.Resize(ref signed, 64);
 
             message.SignatureBase64 = Convert.ToBase64String(signed);
 

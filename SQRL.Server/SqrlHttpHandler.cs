@@ -26,8 +26,8 @@ namespace SQRL.Server
                         Version = context.Request.QueryString["sqrlver"],
                         Options = context.Request.QueryString["sqrlopt"],
                         AdditionalDomainCharacters = additionalChars,
-                        Uri = context.Request.Url,
-                        IpAddress = GetClientIp(context)
+                        Uri = GetAdjustedUrl(context),
+                        IpAddress = context.Request.GetClientIpAddress()
                     };
 
                 var validator = new MessageValidator();
@@ -35,7 +35,7 @@ namespace SQRL.Server
 
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
             }
-            catch (Exception ex)
+            catch (SqrlAuthenticationException ex)
             {
                 context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
                 context.Response.StatusDescription = ex.Message;
@@ -44,12 +44,18 @@ namespace SQRL.Server
             context.Response.End();
         }
 
-        private string GetClientIp(HttpContextBase context)
+        private static Uri GetAdjustedUrl(HttpContextBase context)
         {
-            string ipAddress = context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-            if (String.IsNullOrEmpty(ipAddress))
-                ipAddress = context.Request.ServerVariables["REMOTE_ADDR"];
-            return ipAddress;
+            string scheme = context.Request.GetScheme();
+            if ("https".Equals(scheme, StringComparison.OrdinalIgnoreCase) &&
+                "http".Equals(context.Request.Url.Scheme, StringComparison.OrdinalIgnoreCase))
+            {
+                string uri = context.Request.Url.ToString();
+                uri = uri.Replace("http://", "https://");
+                return new Uri(uri);
+            }
+
+            return context.Request.Url;
         }
 
         public bool IsReusable

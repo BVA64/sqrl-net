@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using SQRL.Server;
 
 namespace SQRL.Samples.Web
 {
@@ -13,13 +14,7 @@ namespace SQRL.Samples.Web
                 throw new ArgumentNullException("filterContext");
             }
 
-            if (filterContext.HttpContext.Request.IsSecureConnection)
-            {
-                return;
-            }
-
-            string proto = filterContext.HttpContext.Request.Headers["X-Forwarded-Proto"];
-            if (string.IsNullOrEmpty(proto) || string.Equals(proto, "https", StringComparison.InvariantCultureIgnoreCase))
+            if (filterContext.HttpContext.Request.GetIsSecureConnection())
             {
                 return;
             }

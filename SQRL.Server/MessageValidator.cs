@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using Sodium;
 
@@ -32,41 +33,49 @@ namespace SQRL.Server
             ISqrlAuthenticationHandler handler = GetHandler();
             if (handler == null || msg.Uri == null || msg.PublicKeyBase64 == null || msg.SignatureBase64 == null)
             {
-                throw new InvalidOperationException();
+                string error = string.Empty;
+                if (handler == null) error = "Handler";
+                else if (msg.Uri == null) error = "URL";
+                else if (msg.PublicKeyBase64 == null) error = "Public key";
+                else if (msg.SignatureBase64 == null) error = "Signature";
+
+                throw new SqrlAuthenticationException(string.Format("Invalid parameters.  {0} was not specified.", error));
             }
 
             if (msg.Version != SqrlVersion)
             {
-                throw new Exception("Invalid version.  Expected version was: " + SqrlVersion);
+                throw new SqrlAuthenticationException("Invalid version.  Expected version was: " + SqrlVersion);
             }
 
             if (!handler.VerifySession(msg.IpAddress, msg.ServerNonce))
             {
-                throw new Exception("Session not found.");
+                throw new SqrlAuthenticationException("Session not found.");
             }
 
-            if (!Verify(msg))
-            {
-                throw new Exception("Authentication failed.");
-            }
+            VerifyMessage(msg);
 
             handler.AuthenticateSession(msg.PublicKeyBase64, msg.IpAddress, msg.ServerNonce);
         }
 
-        private static bool Verify(SqrlMessage sqrl)
+        private static void VerifyMessage(SqrlMessage sqrl)
         {
-            byte[] message;
-            if (!CryptoSign.Open(sqrl.SignatureBytes, sqrl.PublicKeyBytes, out message))
-            {
-                return false;
-            }
-
             string url = sqrl.Uri.ToString()
-                             .Replace("https://", "sqrl://")
-                             .Replace("http://", "qrl://");
+                            .Replace("https://", "sqrl://")
+                            .Replace("http://", "qrl://");
+            
+            var idn = new IdnMapping();
+            var puny = idn.GetAscii(url);
+            var punyBytes = Encoding.ASCII.GetBytes(puny);
+            var signatureBytes = sqrl.SignatureBytes;
 
-            string signedUrl = Encoding.ASCII.GetString(message);
-            return signedUrl.Equals(url, StringComparison.Ordinal);
+            var signature = new byte[punyBytes.Length + signatureBytes.Length];
+            Buffer.BlockCopy(signatureBytes, 0, signature, 0, signatureBytes.Length);
+            Buffer.BlockCopy(punyBytes, 0, signature, signatureBytes.Length, punyBytes.Length);
+
+            if (!CryptoSign.Open(signature, sqrl.PublicKeyBytes))
+            {
+                throw new SqrlAuthenticationException("Signature verification failed.");
+            }
         }
 
         private ISqrlAuthenticationHandler GetHandler()

@@ -43,6 +43,7 @@ namespace SQRL.Server.Test
                 request.SetupGet(x => x.QueryString).Returns(queryString);
                 request.SetupGet(x => x.Form).Returns(forms);
                 request.SetupGet(x => x.ServerVariables).Returns(new NameValueCollection());
+                request.SetupGet(x => x.Headers).Returns(new NameValueCollection());
 
                 var response = Mock.Get(_context.Response);
                 response.SetupProperty(ctx => ctx.StatusCode);

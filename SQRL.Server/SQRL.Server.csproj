@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RequestExtensions.cs" />
+    <Compile Include="SqrlAuthenticationException.cs" />
     <Compile Include="UrlSafeBase64Encoder.cs" />
     <Compile Include="ISqrlAuthenticationHandler.cs" />
     <Compile Include="ISqrlAuthenticationHandlerFactory.cs" />

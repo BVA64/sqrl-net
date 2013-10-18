@@ -41,7 +41,7 @@ namespace SQRL.Server.Test
                 _mockHandler.VerifyAll();
             }
 
-            [Fact(Skip = "testing")]
+            [Fact]
             public void InvalidUrlReturnsThrows()
             {
                 _message.Uri = new Uri(_message.Uri + "B");
@@ -49,7 +49,7 @@ namespace SQRL.Server.Test
                 Action act = () => _validator.Validate(_message);
 
                 act.ShouldThrow<Exception>()
-                   .And.Message.Should().Be("Authentication failed.");
+                   .And.Message.Should().Be("Signature verification failed.");
             }
 
             [Fact]
@@ -62,7 +62,7 @@ namespace SQRL.Server.Test
                 Action act = () => _validator.Validate(_message);
 
                 act.ShouldThrow<Exception>()
-                   .And.Message.Should().Be("Authentication failed.");
+                   .And.Message.Should().Be("Signature verification failed.");
             }
 
             [Fact]
@@ -75,7 +75,7 @@ namespace SQRL.Server.Test
                 Action act = () => _validator.Validate(_message);
 
                 act.ShouldThrow<Exception>()
-                   .And.Message.Should().Be("Authentication failed.");
+                   .And.Message.Should().Be("Signature verification failed.");
             }
         } 
     }
