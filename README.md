@@ -14,6 +14,5 @@ You can see a sample of the sample web server running at: https://sqrl.apphb.com
 
 ### Features for the Future
 
-* More strict checks on the server side.
-* Identity management (multiple identities).
+* Identity management (multiple identities, import/export).
 * Generate QR codes locally.
